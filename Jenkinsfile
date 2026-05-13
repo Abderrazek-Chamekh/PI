@@ -47,33 +47,33 @@ spec:
 
     stages {
 
-        stage('Build Backend (Kaniko)') {
-            steps {
-                container('kaniko-backend') {
-                    sh """
-                    /kaniko/executor \
-                        --context=dir:///workspace/${JOB_NAME}/springLooking \
-                        --dockerfile=Dockerfile \
-                        --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
-                        --cleanup
-                    """
-                }
-            }
+       stage('Build Backend (Kaniko)') {
+    steps {
+        container('kaniko-backend') {
+            sh """
+            /kaniko/executor \
+                --context=dir:///home/jenkins/agent/workspace/PI-pipeline/springLooking \
+                --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/springLooking/Dockerfile \
+                --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
+                --cleanup
+            """
         }
+    }
+}
 
-        stage('Build Frontend (Kaniko)') {
-            steps {
-                container('kaniko-frontend') {
-                    sh """
-                    /kaniko/executor \
-                        --context=dir:///workspace/${JOB_NAME}/Angular1 \
-                        --dockerfile=Dockerfile \
-                        --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
-                        --cleanup
-                    """
-                }
-            }
+stage('Build Frontend (Kaniko)') {
+    steps {
+        container('kaniko-frontend') {
+            sh """
+            /kaniko/executor \
+                --context=dir:///home/jenkins/agent/workspace/PI-pipeline/Angular1 \
+                --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/Angular1/Dockerfile \
+                --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
+                --cleanup
+            """
         }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
