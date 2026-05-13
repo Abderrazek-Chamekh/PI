@@ -28,6 +28,12 @@ spec:
     command: ["sleep"]
     args: ["9999999"]
 
+  - name: jnlp
+    image: jenkins/inbound-agent:3355.v388858a_47b_33-3-jdk21
+    env:
+      - name: GODEBUG
+        value: netdns=go
+
   volumes:
     - name: docker-credentials
       secret:
@@ -47,33 +53,33 @@ spec:
 
     stages {
 
-       stage('Build Backend (Kaniko)') {
-    steps {
-        container('kaniko-backend') {
-            sh """
-            /kaniko/executor \
-                --context=dir:///home/jenkins/agent/workspace/PI-pipeline/springLooking \
-                --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/springLooking/Dockerfile \
-                --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
-                --cleanup
-            """
+        stage('Build Backend (Kaniko)') {
+            steps {
+                container('kaniko-backend') {
+                    sh """
+                    /kaniko/executor \
+                        --context=dir:///home/jenkins/agent/workspace/PI-pipeline/springLooking \
+                        --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/springLooking/Dockerfile \
+                        --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
+                        --cleanup
+                    """
+                }
+            }
         }
-    }
-}
 
-stage('Build Frontend (Kaniko)') {
-    steps {
-        container('kaniko-frontend') {
-            sh """
-            /kaniko/executor \
-                --context=dir:///home/jenkins/agent/workspace/PI-pipeline/Angular1 \
-                --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/Angular1/Dockerfile \
-                --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
-                --cleanup
-            """
+        stage('Build Frontend (Kaniko)') {
+            steps {
+                container('kaniko-frontend') {
+                    sh """
+                    /kaniko/executor \
+                        --context=dir:///home/jenkins/agent/workspace/PI-pipeline/Angular1 \
+                        --dockerfile=/home/jenkins/agent/workspace/PI-pipeline/Angular1/Dockerfile \
+                        --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
+                        --cleanup
+                    """
+                }
+            }
         }
-    }
-}
 
         stage('Deploy to Kubernetes') {
             steps {
