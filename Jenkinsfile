@@ -9,49 +9,49 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Backend (Kaniko)') {
             steps {
-                sh """
-                /kaniko/executor \
-                    --context=dir://springLooking \
-                    --dockerfile=Dockerfile \
-                    --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
-                    --cleanup
-                """
+                container('kaniko') {
+                    sh """
+                    /kaniko/executor \
+                        --context=dir://springLooking \
+                        --dockerfile=Dockerfile \
+                        --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
+                        --cleanup
+                    """
+                }
             }
         }
 
         stage('Build Frontend (Kaniko)') {
             steps {
-                sh """
-                /kaniko/executor \
-                    --context=dir://Angular1 \
-                    --dockerfile=Dockerfile \
-                    --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
-                    --cleanup
-                """
+                container('kaniko') {
+                    sh """
+                    /kaniko/executor \
+                        --context=dir://Angular1 \
+                        --dockerfile=Dockerfile \
+                        --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
+                        --cleanup
+                    """
+                }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh """
-                        kubectl set image deployment/backend \
-                            backend=${DOCKERHUB_BACKEND}:${IMAGE_TAG} -n app
+                container('kubectl') {
+                    withKubeConfig([credentialsId: 'kubeconfig']) {
+                        sh """
+                            kubectl set image deployment/backend \
+                                backend=${DOCKERHUB_BACKEND}:${IMAGE_TAG} -n app
 
-                        kubectl set image deployment/frontend \
-                            frontend=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} -n app
+                            kubectl set image deployment/frontend \
+                                frontend=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} -n app
 
-                        kubectl rollout status deployment/backend -n app
-                        kubectl rollout status deployment/frontend -n app
-                    """
+                            kubectl rollout status deployment/backend -n app
+                            kubectl rollout status deployment/frontend -n app
+                        """
+                    }
                 }
             }
         }
