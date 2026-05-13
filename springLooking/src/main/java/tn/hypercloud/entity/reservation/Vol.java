@@ -1,0 +1,55 @@
+package tn.hypercloud.entity.reservation;
+
+import jakarta.persistence.*;
+import lombok.*;
+import tn.hypercloud.entity.user.User;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "vol")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Vol {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false)
+    private User user;  // remplace Societe societe
+
+    @Column(nullable = false, length = 20)
+    private String numero;
+
+    @Column(nullable = false, length = 10)
+    private String depart;
+
+    @Column(nullable = false, length = 10)
+    private String arrivee;
+
+    @Column(name = "date_depart", nullable = false)
+    private LocalDate dateDepart;
+
+    @Column(name = "heure_depart", nullable = false)
+    private LocalTime heureDepart;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal prix;
+
+    @Column(nullable = false)
+    private int places = 0;
+
+    @OneToMany(mappedBy = "vol", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Escale> escales;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_offre")
+    private Offre offre;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer retard = 0;
+}

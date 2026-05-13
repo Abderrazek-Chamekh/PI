@@ -1,0 +1,96 @@
+/* Minimal CSS - Most styling handled by Tailwind CSS */
+
+/* Smooth transitions */
+button, input, select {
+  transition: all 0.3s ease;
+}
+
+/* Enhanced input field styling */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+  transition: all 0.2s ease;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="tel"]:hover,
+select:hover {
+  border-color: #003974;
+}
+
+/* Input focus state with smooth animation */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(0, 57, 116, 0.1);
+  border-color: #003974;
+  animation: focusPulse 0.3s ease-out;
+}
+
+@keyframes focusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 57, 116, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(0, 57, 116, 0.1);
+  }
+}
+
+/* Country field dropdown icon animation */
+.relative:has(input:focus) svg,
+.relative:has(input:not(:placeholder-shown)) svg {
+  animation: dropdownRotate 0.3s ease-out forwards;
+  color: #003974;
+}
+
+@keyframes dropdownRotate {
+  from {
+    transform: translateY(-2px) rotate(0deg);
+  }
+  to {
+    transform: translateY(0) rotate(180deg);
+  }
+}
+
+/* Icon color transition */
+svg {
+  transition: all 0.2s ease;
+}
+
+.relative:has(input:focus) svg {
+  color: #003974;
+}
+
+/* Datalist options styling (browser-dependent) */
+#countryList option {
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+
+/* Custom scrollbar for summary items */
+.max-h-80::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-80::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.max-h-80::-webkit-scrollbar-thumb {
+  background: #003974;
+  border-radius: 10px;
+}
+
+.max-h-80::-webkit-scrollbar-thumb:hover {
+  background: #002a54;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: #003974 #f1f1f1;
+  scrollbar-width: thin;
+}

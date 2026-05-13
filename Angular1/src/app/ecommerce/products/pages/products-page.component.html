@@ -1,0 +1,379 @@
+<div class="min-h-screen bg-gradient-to-b from-[#f7f9fc] to-white">
+  <!-- Hero Section -->
+  <section class="relative h-96 bg-gradient-to-r from-[#003974] to-[#002a54] overflow-hidden">
+    <img
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdjFDCQymtmRFdEvPIed0_A0QYdaGlhMGwSQzD1DaxxWq7hmeFV73rLhvhApoBNUCJvL0ElYnYMFMW_IfQovBHqJx9_H97kbMA2lGa9YJLrlxB-z_uszAO6YAms5ExzCTAxgkObgAJcZhc36aeCrVQDVwoJ-XtCBsxzxhETuNCLzLB7ZJH1uQITISwpAlNeKrTFhTeJJZS8PpcbRoSVJHAnSaiEa4v2rmREkQMkOxaMTp1vwWzYkU7n9bExnsarsr2OAwo7B73flU"
+      class="absolute inset-0 w-full h-full object-cover opacity-30"
+      alt="Produits"
+    />
+    <div class="absolute inset-0 bg-gradient-to-r from-[#003974]/80 to-transparent"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center text-white">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4">Nos Produits</h1>
+      <p class="text-xl text-white/90 max-w-2xl">Découvrez notre collection complète d'articles artisanaux</p>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Search & Header -->
+    <div class="mb-8 space-y-4">
+      <div class="flex gap-4 items-center">
+        <div class="flex-1">
+          <input
+            type="text"
+            placeholder="Rechercher un produit..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+            class="w-full px-4 py-3 border border-[#dbe1ea] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003974]"
+          />
+        </div>
+        <button
+          (click)="onSearch()"
+          class="px-6 py-3 bg-[#003974] text-white rounded-lg font-semibold hover:bg-[#002a54]"
+        >
+          Rechercher
+        </button>
+        <button
+          (click)="resetFilters()"
+          class="px-6 py-3 bg-[#d6e3ff] text-[#003974] rounded-lg font-semibold hover:bg-[#c5d5ff]"
+        >
+          Réinitialiser
+        </button>
+        <button
+          (click)="goToCart()"
+          class="relative px-4 py-3 bg-[#003974] text-white rounded-lg font-semibold hover:bg-[#002a54] text-2xl"
+          title="View Cart"
+        >
+          🛒
+          <span *ngIf="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            {{ cartItemCount }}
+          </span>
+        </button>
+        <button
+          (click)="goToOrders()"
+          class="px-6 py-3 bg-[#003974] text-white rounded-lg font-semibold hover:bg-[#002a54]"
+          title="View My Orders"
+        >
+          Mes Commandes
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar Filters -->
+      <aside class="lg:col-span-1">
+        <div class="bg-white rounded-lg border border-[#dbe1ea] p-6 space-y-6 sticky top-24">
+          <h3 class="font-bold text-[#003974] text-lg">Filtres</h3>
+
+          <!-- Sort -->
+          <div>
+            <label class="block text-sm font-semibold text-[#1b2430] mb-2">Tri</label>
+            <select
+              [(ngModel)]="sortBy"
+              (change)="applyFilters()"
+              class="w-full px-3 py-2 border border-[#dbe1ea] rounded-lg"
+            >
+              <option value="newest">Plus récents</option>
+              <option value="price-low">Prix: Bas → Haut</option>
+              <option value="price-high">Prix: Haut → Bas</option>
+              <option value="popular">Populaires</option>
+            </select>
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label class="block text-sm font-semibold text-[#1b2430] mb-2">Catégorie</label>
+            <select
+              [(ngModel)]="selectedCategoryId"
+              (change)="applyFilters()"
+              class="w-full px-3 py-2 border border-[#dbe1ea] rounded-lg"
+            >
+              <option [ngValue]="null">Toutes les catégories</option>
+              <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Price Range -->
+          <div>
+            <label class="block text-sm font-semibold text-[#1b2430] mb-2">Prix</label>
+            <div class="space-y-2">
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                [(ngModel)]="priceRange.min"
+                (change)="applyFilters()"
+                class="w-full"
+              />
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                [(ngModel)]="priceRange.max"
+                (change)="applyFilters()"
+                class="w-full"
+              />
+              <p class="text-sm text-[#5f6874]">TND {{ priceRange.min }} - TND {{ priceRange.max }}</p>
+            </div>
+          </div>
+
+          <!-- Checkboxes -->
+          <div>
+            <label class="flex items-center gap-2 cursor-pointer mb-3">
+              <input
+                type="checkbox"
+                [(ngModel)]="inStockOnly"
+                (change)="applyFilters()"
+                class="w-4 h-4"
+              />
+              <span class="text-sm text-[#5f6874]">En stock uniquement</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                [(ngModel)]="onPromoOnly"
+                (change)="applyFilters()"
+                class="w-4 h-4"
+              />
+              <span class="text-sm text-[#5f6874]">En promotion</span>
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Products Grid -->
+      <main class="lg:col-span-3">
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="flex justify-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003974]"></div>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 mb-6">
+          {{ error }}
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="!isLoading && paginatedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            *ngFor="let product of paginatedProducts"
+            class="bg-white rounded-lg border border-[#dbe1ea] overflow-hidden hover:shadow-lg transition-shadow"
+          >
+            <!-- Image with Promo Badge -->
+            <div class="relative overflow-hidden bg-[#f7f9fc] h-48">
+              <img
+                [src]="getImageUrl(product.image)"
+                [alt]="product.name"
+                class="w-full h-full object-cover hover:scale-105 transition-transform"
+              />
+              <!-- Discount Badge (Top Left) -->
+              <div
+                *ngIf="product.discount || product.discountPrice"
+                class="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-bold text-white bg-red-500"
+              >
+                -{{ product.discount || calculateDiscountPercentage(product.price, product.discountPrice) }}%
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-bold text-[#003974] line-clamp-2">{{ product.name }}</h3>
+              </div>
+
+              <p class="text-[#5f6874] text-sm mb-3 line-clamp-2">{{ product.description }}</p>
+
+              <!-- Price -->
+              <div class="flex gap-2 mb-3 items-baseline">
+                <span class="text-2xl font-bold text-[#003974]">{{ (product.discountPrice || product.price) | number: '1.2-2' }} TND</span>
+                <span *ngIf="product.discountPrice" class="text-sm text-[#5f6874] line-through">
+                  {{ product.price | number: '1.2-2' }} TND
+                </span>
+              </div>
+
+              <!-- Stock Status -->
+              <p
+                [class]="'text-xs font-bold mb-3 ' + ((product.stock || product.stockQuantity || 0) > 0 ? 'text-green-600' : 'text-red-600')"
+              >
+                {{ (product.stock || product.stockQuantity || 0) > 0 ? '✓ En stock' : '✗ Rupture' }}
+              </p>
+
+              <!-- Action -->
+              <button
+                (click)="addToCart(product)"
+                [disabled]="!canAddToCart(product)"
+                class="w-full px-4 py-2 bg-[#003974] text-white rounded-lg font-semibold hover:bg-[#002a54] disabled:bg-[#dbe1ea] disabled:cursor-not-allowed transition-colors mb-2"
+              >
+                Ajouter au panier
+              </button>
+              <button
+                (click)="viewProduct(product)"
+                class="w-full px-4 py-2 bg-[#d6e3ff] text-[#003974] rounded-lg font-semibold hover:bg-[#c5d5ff]"
+              >
+                Voir détails
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="!isLoading && filteredProducts.length > 0 && totalPages > 1"
+             class="flex items-center justify-center gap-2 mt-10 pt-8 border-t border-[#e8eff7] flex-wrap">
+
+          <!-- Previous -->
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            class="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-[#003974] border-2 border-[#e8eff7] rounded-xl hover:border-[#003974] hover:bg-[#f0f5fb] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            <span class="material-symbols-outlined text-base">navigate_before</span>
+            Préc.
+          </button>
+
+          <!-- First page shortcut -->
+          <button
+            *ngIf="pages[0] > 1"
+            (click)="goToPage(1)"
+            class="w-9 h-9 flex items-center justify-center border-2 border-[#e8eff7] rounded-xl text-sm font-bold text-[#5f6874] hover:border-[#003974] transition-all"
+          >1</button>
+          <span *ngIf="pages[0] > 2" class="text-[#5f6874] px-1">…</span>
+
+          <!-- Page numbers window -->
+          <button
+            *ngFor="let page of pages"
+            (click)="goToPage(page)"
+            [class]="page === currentPage
+              ? 'w-9 h-9 flex items-center justify-center border-2 border-[#003974] rounded-xl text-sm font-bold bg-[#003974] text-white shadow-md'
+              : 'w-9 h-9 flex items-center justify-center border-2 border-[#e8eff7] rounded-xl text-sm font-bold text-[#5f6874] hover:border-[#003974] hover:text-[#003974] transition-all'"
+          >{{ page }}</button>
+
+          <!-- Last page shortcut -->
+          <span *ngIf="pages[pages.length - 1] < totalPages - 1" class="text-[#5f6874] px-1">…</span>
+          <button
+            *ngIf="pages[pages.length - 1] < totalPages"
+            (click)="goToPage(totalPages)"
+            class="w-9 h-9 flex items-center justify-center border-2 border-[#e8eff7] rounded-xl text-sm font-bold text-[#5f6874] hover:border-[#003974] transition-all"
+          >{{ totalPages }}</button>
+
+          <!-- Next -->
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            class="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-[#003974] border-2 border-[#e8eff7] rounded-xl hover:border-[#003974] hover:bg-[#f0f5fb] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            Suiv.
+            <span class="material-symbols-outlined text-base">navigate_next</span>
+          </button>
+        </div>
+
+        <!-- Results count -->
+        <p *ngIf="!isLoading && filteredProducts.length > 0" class="text-center text-xs text-[#5f6874] mt-4">
+          Affichage {{ (currentPage - 1) * pageSize + 1 }}–{{ Math.min(currentPage * pageSize, filteredProducts.length) }} sur {{ filteredProducts.length }} produit(s)
+        </p>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && filteredProducts.length === 0" class="text-center py-12">
+          <p class="text-[#5f6874] text-lg mb-4">Aucun produit trouvé</p>
+          <button
+            (click)="resetFilters()"
+            class="px-6 py-2 bg-[#003974] text-white rounded-lg font-semibold hover:bg-[#002a54]"
+          >
+            Réinitialiser les filtres
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Product Detail Modal -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20">
+  <!-- Backdrop -->
+  <div
+    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    (click)="closeModal()"
+  ></div>
+
+  <!-- Modal Card -->
+  <div class="relative z-50 bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden" *ngIf="selectedProduct">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-[#e8eff7] flex-shrink-0">
+      <h2 class="text-base font-bold text-[#003974] line-clamp-1 pr-4">{{ selectedProduct.name }}</h2>
+      <button
+        (click)="closeModal()"
+        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#f7f9fc] hover:bg-red-50 hover:text-red-600 text-[#5f6874] font-bold transition-colors flex-shrink-0"
+      >✕</button>
+    </div>
+
+    <!-- Body: image left + info right -->
+    <div class="flex flex-col md:flex-row flex-1 min-h-0">
+
+      <!-- Image -->
+      <div class="md:w-2/5 flex-shrink-0 bg-[#f7f9fc]">
+        <img
+          [src]="getImageUrl(selectedProduct.image)"
+          [alt]="selectedProduct.name"
+          class="w-full h-48 md:h-full object-cover"
+        />
+      </div>
+
+      <!-- Info -->
+      <div class="md:w-3/5 p-6 flex flex-col gap-3 overflow-y-auto">
+
+        <!-- Category -->
+        <span class="self-start text-xs font-bold px-3 py-1 bg-[#d6e3ff] text-[#003974] rounded-full">
+          {{ selectedProduct.category || 'Artisanat' }}
+        </span>
+
+        <!-- Description -->
+        <p class="text-[#5f6874] text-sm leading-relaxed">{{ selectedProduct.description }}</p>
+
+        <!-- Price -->
+        <div class="flex items-baseline flex-wrap gap-2">
+          <span class="text-2xl font-bold text-[#003974]">
+            {{ (selectedProduct.discountPrice || selectedProduct.price) | number: '1.2-2' }} TND
+          </span>
+          <span *ngIf="selectedProduct.discountPrice" class="text-sm text-[#5f6874] line-through">
+            {{ selectedProduct.price | number: '1.2-2' }} TND
+          </span>
+          <span *ngIf="selectedProduct.discountPrice" class="text-xs font-bold px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
+            -{{ calculateDiscountPercentage(selectedProduct.price, selectedProduct.discountPrice) }}%
+          </span>
+        </div>
+
+        <!-- Stock -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span [class]="'text-sm font-bold ' + ((selectedProduct.stockQuantity || 0) > 0 ? 'text-green-600' : 'text-red-600')">
+            {{ (selectedProduct.stockQuantity || 0) > 0 ? '✓ En stock' : '✗ Rupture de stock' }}
+          </span>
+          <span *ngIf="(selectedProduct.stockQuantity || 0) > 0" class="text-xs text-[#5f6874]">
+            — {{ selectedProduct.stockQuantity }} unités disponibles
+          </span>
+        </div>
+
+        <div class="flex-1"></div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-3 border-t border-[#e8eff7] flex-shrink-0">
+          <button
+            (click)="addToCartFromModal()"
+            [disabled]="!canAddToCart(selectedProduct)"
+            class="flex-1 px-4 py-2.5 bg-[#003974] text-white rounded-xl font-bold hover:bg-[#002a54] disabled:bg-[#dbe1ea] disabled:cursor-not-allowed transition-colors text-sm"
+          >
+            🛒 Ajouter au panier
+          </button>
+          <button
+            (click)="closeModal()"
+            class="px-4 py-2.5 bg-[#f7f9fc] text-[#003974] border border-[#dbe1ea] rounded-xl font-bold hover:bg-[#d6e3ff] transition-colors text-sm"
+          >
+            Fermer
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
