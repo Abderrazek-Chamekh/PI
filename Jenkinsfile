@@ -1,5 +1,43 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+
+  - name: kaniko-backend
+    image: gcr.io/kaniko-project/executor:debug
+    command: ["sleep"]
+    args: ["9999999"]
+    volumeMounts:
+      - name: docker-credentials
+        mountPath: /kaniko/.docker
+
+  - name: kaniko-frontend
+    image: gcr.io/kaniko-project/executor:debug
+    command: ["sleep"]
+    args: ["9999999"]
+    volumeMounts:
+      - name: docker-credentials
+        mountPath: /kaniko/.docker
+
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command: ["sleep"]
+    args: ["9999999"]
+
+  volumes:
+    - name: docker-credentials
+      secret:
+        secretName: dockerhub-secret
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+"""
+        }
+    }
 
     environment {
         DOCKERHUB_BACKEND  = "docker.io/abderrazekchamekh/looking-backend"
@@ -11,10 +49,10 @@ pipeline {
 
         stage('Build Backend (Kaniko)') {
             steps {
-                container('kaniko') {
+                container('kaniko-backend') {
                     sh """
                     /kaniko/executor \
-                        --context=dir://springLooking \
+                        --context=dir:///workspace/${JOB_NAME}/springLooking \
                         --dockerfile=Dockerfile \
                         --destination=${DOCKERHUB_BACKEND}:${IMAGE_TAG} \
                         --cleanup
@@ -25,10 +63,10 @@ pipeline {
 
         stage('Build Frontend (Kaniko)') {
             steps {
-                container('kaniko') {
+                container('kaniko-frontend') {
                     sh """
                     /kaniko/executor \
-                        --context=dir://Angular1 \
+                        --context=dir:///workspace/${JOB_NAME}/Angular1 \
                         --dockerfile=Dockerfile \
                         --destination=${DOCKERHUB_FRONTEND}:${IMAGE_TAG} \
                         --cleanup
