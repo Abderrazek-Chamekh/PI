@@ -57,3 +57,5 @@ src/environments/environment.ts
 *.wav
 
 assets/images/
+assets/images/
+src/assets/images/

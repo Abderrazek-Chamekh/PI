@@ -153,22 +153,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        // Accepter localhost sur n'importe quel port en développement
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://localhost",
-                "http://10.0.0.153:*",
-                "http://192.168.100.*:*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setAllowCredentials(true);
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOriginPatterns(List.of(
+        "http://localhost:*",
+        "http://localhost",
+        "http://10.0.0.153:*",
+        "http://192.168.100.*:*",
+        "http://192.168.1.*:*"    // ← c'était manquant
+    ));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));          // ← élargir comme CorsConfig
+    config.setExposedHeaders(List.of("Authorization", "Content-Type"));
+    config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
 
 }
